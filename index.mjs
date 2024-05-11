@@ -79,19 +79,49 @@ async function initialLoad() {
   //   `https://api.thecatapi.com/v1/images/search?limit=10`
   // );
   let apiDataJson = await apiData.json();
-  // console.log(apiDataJson);
+  const initCats = apiDataJson[0].id;
+
+  const apiData2 = fetch(`https://api.thecatapi.com/v1/images/${initCats}`);
+  apiData2.then((cat) => {
+    const initCat = cat.json();
+    initCat.then((initCatId) => {
+      console.log(initCatId);
+      const divElem = document.createElement("div");
+      const hrPreTag = document.createElement("hr");
+      const hrAppTag = document.createElement("hr");
+      const hrPTag = document.createElement("hr");
+      divElem.style.borderRadius = "5px";
+      const pElem = document.createElement("p");
+      pElem.style.fontSize = "30px";
+      pElem.style.padding = "15px";
+      pElem.style.color = "white";
+      pElem.textContent = initCatId.breeds[0].description;
+      const initCarousel = Carousel.createCarouselItem(
+        initCatId.url,
+        "Bengal cat",
+        initCatId.id
+      );
+      divElem.appendChild(initCarousel);
+      divElem.appendChild(pElem);
+      divElem.prepend(hrPreTag);
+      divElem.appendChild(hrAppTag);
+      infoDump.appendChild(divElem);
+    });
+  });
   return apiDataJson;
 }
-
+//-------------------------------------------------------------------------------------------------------//
 initialLoad().then((cats) => {
+  let count = 1;
   cats.forEach((cat) => {
     // console.log(cat);
     let catOptions = document.createElement("option");
     catOptions.setAttribute("value", `${cat.id}`);
-    catOptions.textContent = `${cat.breeds[0].name}`;
+    catOptions.textContent = `${cat.breeds[0].name} ${count++}`;
     breedSelect.appendChild(catOptions);
   });
 });
+//========================================================================================================//
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -129,7 +159,6 @@ breedSelect.addEventListener("change", (e) => {
       const pElem = document.createElement("p");
       pElem.style.fontSize = "30px";
       pElem.style.padding = "15px";
-      // pElem.style.marginTop = "25px";
       pElem.style.color = "white";
       pElem.textContent = catInfo.breeds[0].description;
       const newCarousel = Carousel.createCarouselItem(
@@ -153,7 +182,7 @@ breedSelect.addEventListener("change", (e) => {
  * - axios has already been imported for you within index.js.
  * - If you've done everything correctly up to this point, this should be simple.
  * - If it is not simple, take a moment to re-evaluate your original code.
- * - Hint: Axios has the ability to set default headers. Use this to your advantage
+ * - Hint: Axios has the ability to set default headers. Use this to your advantage˜
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
