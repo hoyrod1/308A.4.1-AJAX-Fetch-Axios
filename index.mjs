@@ -1,15 +1,18 @@
-import * as Carousel from "./Carousel.mjs";
 // import axios from "axios";
+import * as Carousel from "./Carousel.mjs";
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
+// console.log(breedSelect);
 // The information section div element.
 const infoDump = document.getElementById("infoDump");
+// console.log(infoDump);
 // The progress bar div element.
 const progressBar = document.getElementById("progressBar");
+// console.log(progressBar);
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
-
+// console.log(getFavouritesBtn);
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY =
   "live_WP5thLG1uRXMRvBqQ8gW6TZOQpr99TbTwIOfBjS04urJlLYckwY7No2RhITGmWGI";
@@ -24,41 +27,41 @@ const API_KEY =
 //   });
 //================================================================================//
 // USE THEN WHEN ACCESSING API OUTSIDE OF A ASYNC FUNCTION FOR FETCH
-fetch("https://api.thecatapi.com/v1/images/search")
-  .then((x) => {
-    // console.log(x);
-    x.json().then((x) => {
-      console.log(x);
-    });
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+// fetch("https://api.thecatapi.com/v1/images/search")
+//   .then((x) => {
+//     // console.log(x);
+//     x.json().then((x) => {
+//       console.log(x);
+//     });
+//   })
+//   .catch((e) => {
+//     console.log(e);
+//   });
 //================================================================================//
 // ASYNC FUNCTION WITH AXIOS
-async function testApi1() {
-  let apiData = await axios(
-    "https://api.thecatapi.com/v1/images/search?limit=10"
-  );
-  console.log(apiData.data);
-}
+// async function testApi1() {
+//   let apiData = await axios(
+//     "https://api.thecatapi.com/v1/images/search?limit=10"
+//   );
+//   console.log(apiData.data);
+// }
 
-testApi1().then((x) => {
-  //console.log(x);
-});
+// testApi1().then((x) => {
+//   //console.log(x);
+// });
 //================================================================================//
 // ASYNC FUNCTION WITH FETCH
-async function testApi() {
-  let apiData = await fetch(
-    "https://api.thecatapi.com/v1/images/search?limit=10"
-  );
-  let apiDataJson = await apiData.json();
-  console.log(apiDataJson);
-}
+// async function testApi() {
+//   let apiData = await fetch(
+//     "https://api.thecatapi.com/v1/images/search?limit=10"
+//   );
+//   let apiDataJson = await apiData.json();
+//   console.log(apiDataJson);
+// }
 
-testApi().then((x) => {
-  //console.log(x);
-});
+// testApi().then((x) => {
+//   //console.log(x);
+// });
 //================================================================================//
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -68,7 +71,27 @@ testApi().then((x) => {
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+async function initialLoad() {
+  let apiData = await fetch(
+    `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=beng&api_key=${API_KEY}`
+  );
+  // let apiData = await fetch(
+  //   `https://api.thecatapi.com/v1/images/search?limit=10`
+  // );
+  let apiDataJson = await apiData.json();
+  // console.log(apiDataJson);
+  return apiDataJson;
+}
 
+initialLoad().then((cats) => {
+  cats.forEach((cat) => {
+    // console.log(cat);
+    let catOptions = document.createElement("option");
+    catOptions.setAttribute("value", `${cat.id}`);
+    catOptions.textContent = `${cat.breeds[0].name}`;
+    breedSelect.appendChild(catOptions);
+  });
+});
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -83,7 +106,45 @@ testApi().then((x) => {
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
-
+// const tesCar = Carousel.createCarouselItem;
+// console.log(tesCar);
+breedSelect.addEventListener("change", (e) => {
+  e.preventDefault();
+  // console.log(breedSelect.value);
+  Carousel.clear();
+  const apiData2 = fetch(
+    `https://api.thecatapi.com/v1/images/${breedSelect.value}`
+  );
+  // const response = apiData2.json();
+  apiData2.then((cat) => {
+    let catData = cat.json();
+    catData.then((catInfo) => {
+      if (infoDump.firstChild !== null) {
+        infoDump.removeChild(infoDump.firstChild);
+      }
+      const divElem = document.createElement("div");
+      const hrPreTag = document.createElement("hr");
+      const hrAppTag = document.createElement("hr");
+      divElem.style.borderRadius = "5px";
+      const pElem = document.createElement("p");
+      pElem.style.fontSize = "30px";
+      pElem.style.padding = "15px";
+      // pElem.style.marginTop = "25px";
+      pElem.style.color = "white";
+      pElem.textContent = catInfo.breeds[0].description;
+      const newCarousel = Carousel.createCarouselItem(
+        catInfo.url,
+        "big fury cat",
+        catInfo.id
+      );
+      divElem.appendChild(newCarousel);
+      divElem.appendChild(pElem);
+      divElem.appendChild(hrAppTag);
+      divElem.prepend(hrPreTag);
+      infoDump.appendChild(divElem);
+    });
+  });
+});
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */

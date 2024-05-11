@@ -1,6 +1,6 @@
 //import * as bootstrap from "bootstrap";
 import { favourite } from "./index.mjs";
-
+//==================================================================//
 export function createCarouselItem(imgSrc, imgAlt, imgId) {
   const template = document.querySelector("#carouselItemTemplate");
   const clone = template.content.firstElementChild.cloneNode(true);
@@ -16,14 +16,14 @@ export function createCarouselItem(imgSrc, imgAlt, imgId) {
 
   return clone;
 }
-
+//==================================================================//
 export function clear() {
   const carousel = document.querySelector("#carouselInner");
   while (carousel.firstChild) {
     carousel.removeChild(carousel.firstChild);
   }
 }
-
+//==================================================================//
 export function appendCarousel(element) {
   const carousel = document.querySelector("#carouselInner");
 
@@ -32,7 +32,7 @@ export function appendCarousel(element) {
 
   carousel.appendChild(element);
 }
-
+//==================================================================//
 export function start() {
   const multipleCardCarousel = document.querySelector(
     "#carouselExampleControls"
@@ -74,3 +74,4 @@ export function start() {
     $(multipleCardCarousel).addClass("slide");
   }
 }
+//==================================================================//
