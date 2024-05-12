@@ -72,7 +72,9 @@ const API_KEY =
 //   //console.log(x);
 // });
 //========================================================================================================//
-
+console.log(
+  "====================================== fetch solution ======================================"
+);
 //========================================================================================================//
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -84,7 +86,7 @@ const API_KEY =
  */
 async function initialLoad() {
   let apiData = await fetch(
-    `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=beng&api_key=${API_KEY}`
+    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=beng&api_key=${API_KEY}`
   );
   // let apiData = await fetch(
   //   `https://api.thecatapi.com/v1/images/search?limit=10`

@@ -22,20 +22,6 @@ console.log(
   "====================================== axios solution ======================================"
 );
 //========================================================================================================//
-// ASYNC FUNCTION WITH AXIOS
-// async function testApi1() {
-//   let apiData = await axios(
-//     "https://api.thecatapi.com/v1/images/search?limit=10"
-//   );
-//   console.log(apiData.data);
-// }
-
-// testApi1().then((x) => {
-//   //console.log(x);
-// });
-//========================================================================================================//
-
-//========================================================================================================//
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
@@ -50,7 +36,7 @@ console.log(
  */
 async function initialLoad() {
   const apiAxiosData = await axios(
-    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=beng&api_key=${API_KEY}`
+    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=abys&api_key=${API_KEY}`
   );
   // console.log(apiAxiosData.data[0].id);
   const initCats = apiAxiosData.data[0].id;
