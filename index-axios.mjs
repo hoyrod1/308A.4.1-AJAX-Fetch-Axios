@@ -22,31 +22,6 @@ console.log(
   "====================================== axios solution ======================================"
 );
 //========================================================================================================//
-// USE THEN WHEN ACCESSING API OUTSIDE OF A ASYNC FUNCTION FOR AXIOS
-// axios("https://api.thecatapi.com/v1/images/search")
-//   .then((x) => {
-//     console.log(x);
-//   })
-//   .catch((e) => {
-//     console.log(e);
-//   });
-//========================================================================================================//
-
-//========================================================================================================//
-// USE THEN WHEN ACCESSING API OUTSIDE OF A ASYNC FUNCTION FOR FETCH
-// fetch("https://api.thecatapi.com/v1/images/search")
-//   .then((x) => {
-//     // console.log(x);
-//     x.json().then((x) => {
-//       console.log(x);
-//     });
-//   })
-//   .catch((e) => {
-//     console.log(e);
-//   });
-//========================================================================================================//
-
-//========================================================================================================//
 // ASYNC FUNCTION WITH AXIOS
 // async function testApi1() {
 //   let apiData = await axios(
@@ -56,21 +31,6 @@ console.log(
 // }
 
 // testApi1().then((x) => {
-//   //console.log(x);
-// });
-//========================================================================================================//
-
-//========================================================================================================//
-// ASYNC FUNCTION WITH FETCH
-// async function testApi() {
-//   let apiData = await fetch(
-//     "https://api.thecatapi.com/v1/images/search?limit=10"
-//   );
-//   let apiDataJson = await apiData.json();
-//   console.log(apiDataJson);
-// }
-
-// testApi().then((x) => {
 //   //console.log(x);
 // });
 //========================================================================================================//
@@ -88,6 +48,94 @@ console.log(
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+async function initialLoad() {
+  const apiAxiosData = await axios(
+    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=beng&api_key=${API_KEY}`
+  );
+  // console.log(apiAxiosData.data[0].id);
+  const initCats = apiAxiosData.data[0].id;
+  const apiAxiosData2 = axios(
+    `https://api.thecatapi.com/v1/images/${initCats}`
+  );
+  apiAxiosData2.then((axiosCat) => {
+    // console.log(axiosCat.data);
+    const initCatId = axiosCat.data;
+    const divElem = document.createElement("div");
+    const hrPreTag = document.createElement("hr");
+    const hrAppTag = document.createElement("hr");
+    divElem.style.borderRadius = "5px";
+    const pElem = document.createElement("p");
+    pElem.style.fontSize = "30px";
+    pElem.style.padding = "15px";
+    pElem.style.color = "white";
+    pElem.textContent = initCatId.breeds[0].description;
+    const initCarousel = Carousel.createCarouselItem(
+      initCatId.url,
+      "Bengal cat",
+      initCatId.id
+    );
+    divElem.appendChild(initCarousel);
+    divElem.appendChild(pElem);
+    divElem.prepend(hrPreTag);
+    divElem.appendChild(hrAppTag);
+    infoDump.appendChild(divElem);
+  });
+  // console.log(apiAxiosData2);
+  return apiAxiosData;
+}
+//-------------------------------------------------------------------------------------------------------//
+initialLoad().then((axiosCats) => {
+  // console.log(axiosCats.data);
+  const axiosCatsArray = axiosCats.data;
+  let count = 1;
+  axiosCatsArray.forEach((cat) => {
+    // console.log(cat);
+    let catOptions = document.createElement("option");
+    catOptions.setAttribute("value", `${cat.id}`);
+    catOptions.textContent = `${cat.breeds[0].name} ${count++}`;
+    breedSelect.appendChild(catOptions);
+  });
+});
+//========================================================================================================//
+
+//-------------------------------------------------------------------------------------------------------//
+breedSelect.addEventListener("change", (e) => {
+  e.preventDefault();
+
+  Carousel.clear();
+  const apiAxiosData2 = axios(
+    `https://api.thecatapi.com/v1/images/${breedSelect.value}`
+  );
+
+  apiAxiosData2.then((axiosCat) => {
+    const axiosCatInfo = axiosCat.data;
+    if (infoDump.firstChild !== null) {
+      infoDump.removeChild(infoDump.firstChild);
+    }
+    const divElem = document.createElement("div");
+    const hrPreTag = document.createElement("hr");
+    const hrAppTag = document.createElement("hr");
+    divElem.style.borderRadius = "5px";
+    const pElem = document.createElement("p");
+    pElem.style.fontSize = "30px";
+    pElem.style.padding = "15px";
+    pElem.style.color = "white";
+    pElem.textContent = axiosCatInfo.breeds[0].description;
+    const newCarousel = Carousel.createCarouselItem(
+      axiosCatInfo.url,
+      "big fury cat",
+      axiosCatInfo.id
+    );
+    divElem.appendChild(newCarousel);
+    divElem.appendChild(pElem);
+    divElem.appendChild(hrAppTag);
+    divElem.prepend(hrPreTag);
+    infoDump.appendChild(divElem);
+  });
+});
+//========================================================================================================//
+
+//========================================================================================================//
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
