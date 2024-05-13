@@ -34,91 +34,76 @@ console.log(
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+//========================================================================================================//
+axios.defaults.baseURL = "https://api.thecatapi.com/v1";
+//========================================================================================================//
+axios.defaults.headers.common["x-api-key"] = API_KEY;
+//========================================================================================================//
 async function initialLoad() {
-  const apiAxiosData = await axios(
-    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=abys&api_key=${API_KEY}`
-  );
-  // console.log(apiAxiosData.data[0].id);
-  const initCats = apiAxiosData.data[0].id;
-  const apiAxiosData2 = axios(
-    `https://api.thecatapi.com/v1/images/${initCats}`
-  );
-  apiAxiosData2.then((axiosCat) => {
-    // console.log(axiosCat.data);
-    const initCatId = axiosCat.data;
-    const divElem = document.createElement("div");
-    const hrPreTag = document.createElement("hr");
-    const hrAppTag = document.createElement("hr");
-    divElem.style.borderRadius = "5px";
-    const pElem = document.createElement("p");
-    pElem.style.fontSize = "30px";
-    pElem.style.padding = "15px";
-    pElem.style.color = "white";
-    pElem.textContent = initCatId.breeds[0].description;
-    const initCarousel = Carousel.createCarouselItem(
-      initCatId.url,
-      "Bengal cat",
-      initCatId.id
-    );
-    divElem.appendChild(initCarousel);
-    divElem.appendChild(pElem);
-    divElem.prepend(hrPreTag);
-    divElem.appendChild(hrAppTag);
-    infoDump.appendChild(divElem);
-  });
-  // console.log(apiAxiosData2);
+  const apiAxiosData = await axios(`/breeds`);
+
+  loadCats();
   return apiAxiosData;
 }
 //-------------------------------------------------------------------------------------------------------//
 initialLoad().then((axiosCats) => {
-  // console.log(axiosCats.data);
   const axiosCatsArray = axiosCats.data;
   let count = 1;
   axiosCatsArray.forEach((cat) => {
     // console.log(cat);
     let catOptions = document.createElement("option");
     catOptions.setAttribute("value", `${cat.id}`);
-    catOptions.textContent = `${cat.breeds[0].name} ${count++}`;
+    catOptions.textContent = `${cat.name} ${count++}`;
     breedSelect.appendChild(catOptions);
   });
 });
 //========================================================================================================//
 
-//-------------------------------------------------------------------------------------------------------//
-breedSelect.addEventListener("change", (e) => {
-  e.preventDefault();
+//========================================================================================================//
+breedSelect.addEventListener("change", loadCats);
+async function loadCats() {
+  // e.preventDefault();
 
   Carousel.clear();
+
   const apiAxiosData2 = axios(
-    `https://api.thecatapi.com/v1/images/${breedSelect.value}`
+    `/images/search?limit=20&breed_ids=${breedSelect.value}`
   );
 
+  const pElem = document.createElement("p");
+
   apiAxiosData2.then((axiosCat) => {
-    const axiosCatInfo = axiosCat.data;
-    if (infoDump.firstChild !== null) {
-      infoDump.removeChild(infoDump.firstChild);
-    }
-    const divElem = document.createElement("div");
+    const axiosCatInfoArray = axiosCat.data;
+
+    axiosCatInfoArray.forEach((axiosCatInfo) => {
+      if (infoDump.firstChild !== null) {
+        infoDump.removeChild(infoDump.firstChild);
+      }
+      const newCarousel = Carousel.createCarouselItem(
+        axiosCatInfo.url,
+        breedSelect.value,
+        axiosCatInfo.id
+      );
+
+      if (axiosCatInfo.breeds[0]) {
+        pElem.textContent = axiosCatInfo.breeds[0].description;
+      } else {
+        pElem.textContent = "There is no description for this beautiful feline";
+      }
+
+      Carousel.appendCarousel(newCarousel);
+    });
+
     const hrPreTag = document.createElement("hr");
     const hrAppTag = document.createElement("hr");
-    divElem.style.borderRadius = "5px";
-    const pElem = document.createElement("p");
     pElem.style.fontSize = "30px";
     pElem.style.padding = "15px";
     pElem.style.color = "white";
-    pElem.textContent = axiosCatInfo.breeds[0].description;
-    const newCarousel = Carousel.createCarouselItem(
-      axiosCatInfo.url,
-      "big fury cat",
-      axiosCatInfo.id
-    );
-    divElem.appendChild(newCarousel);
-    divElem.appendChild(pElem);
-    divElem.appendChild(hrAppTag);
-    divElem.prepend(hrPreTag);
-    infoDump.appendChild(divElem);
+    infoDump.prepend(hrPreTag);
+    infoDump.appendChild(pElem);
+    infoDump.appendChild(hrAppTag);
   });
-});
+}
 //========================================================================================================//
 
 //========================================================================================================//

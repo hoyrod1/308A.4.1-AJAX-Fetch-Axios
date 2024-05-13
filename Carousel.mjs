@@ -1,5 +1,7 @@
 //import * as bootstrap from "bootstrap";
+//-------- import the index.mjs to view the "Bengl" cats --------//
 // import { favourite } from "./index.mjs";
+//-------- import the index-axios.mjs to view the "Abyssinian" cats --------//
 import { favourite } from "./index-axios.mjs";
 //==================================================================//
 export function createCarouselItem(imgSrc, imgAlt, imgId) {
