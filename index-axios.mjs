@@ -113,7 +113,10 @@ async function loadCats() {
  * - Add a console.log statement to indicate when requests begin.
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
-
+// console.log(axios.interceptors);
+// axios.interceptors.request.use((request) => {
+//   console.log("Test start");
+// });
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
  * - The progressBar element has already been created for you.

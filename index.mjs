@@ -85,42 +85,13 @@ console.log(
  * This function should execute immediately.
  */
 async function initialLoad() {
-  let apiData = await fetch(
-    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=beng&api_key=${API_KEY}`
-  );
   // let apiData = await fetch(
-  //   `https://api.thecatapi.com/v1/images/search?limit=10`
+  //   `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=beng&api_key=${API_KEY}`
   // );
+  let apiData = await fetch(`https://api.thecatapi.com/v1/breeds`);
   let apiDataJson = await apiData.json();
-  const initCats = apiDataJson[0].id;
 
-  const apiData2 = fetch(`https://api.thecatapi.com/v1/images/${initCats}`);
-  apiData2.then((cat) => {
-    const initCat = cat.json();
-    initCat.then((initCatId) => {
-      console.log(initCatId);
-      const divElem = document.createElement("div");
-      const hrPreTag = document.createElement("hr");
-      const hrAppTag = document.createElement("hr");
-      const hrPTag = document.createElement("hr");
-      divElem.style.borderRadius = "5px";
-      const pElem = document.createElement("p");
-      pElem.style.fontSize = "30px";
-      pElem.style.padding = "15px";
-      pElem.style.color = "white";
-      pElem.textContent = initCatId.breeds[0].description;
-      const initCarousel = Carousel.createCarouselItem(
-        initCatId.url,
-        "Bengal cat",
-        initCatId.id
-      );
-      divElem.appendChild(initCarousel);
-      divElem.appendChild(pElem);
-      divElem.prepend(hrPreTag);
-      divElem.appendChild(hrAppTag);
-      infoDump.appendChild(divElem);
-    });
-  });
+  loadCat();
   return apiDataJson;
 }
 //-------------------------------------------------------------------------------------------------------//
@@ -130,7 +101,7 @@ initialLoad().then((cats) => {
     // console.log(cat);
     let catOptions = document.createElement("option");
     catOptions.setAttribute("value", `${cat.id}`);
-    catOptions.textContent = `${cat.breeds[0].name} ${count++}`;
+    catOptions.textContent = `${cat.name} ${count++}`;
     breedSelect.appendChild(catOptions);
   });
 });
@@ -154,42 +125,48 @@ initialLoad().then((cats) => {
 //-------------------------------------------------------------------------------------------------------//
 // const tesCar = Carousel.createCarouselItem;
 // console.log(tesCar);
-breedSelect.addEventListener("change", (e) => {
-  e.preventDefault();
-  // console.log(breedSelect.value);
+breedSelect.addEventListener("change", loadCat);
+
+async function loadCat() {
+  console.log(breedSelect.value);
   Carousel.clear();
-  const apiData2 = fetch(
-    `https://api.thecatapi.com/v1/images/${breedSelect.value}`
+  let apiData2 = await fetch(
+    `https://api.thecatapi.com/v1/images/search?limit=20&breed_ids=${breedSelect.value}&api_key=${API_KEY}`
   );
-  // const response = apiData2.json();
-  apiData2.then((cat) => {
-    let catData = cat.json();
-    catData.then((catInfo) => {
+
+  if (infoDump.firstChild !== null) {
+    infoDump.removeChild(infoDump.firstChild);
+  }
+  const response = apiData2.json();
+  response.then((cat) => {
+    const pElem = document.createElement("p");
+    cat.forEach((catData) => {
       if (infoDump.firstChild !== null) {
         infoDump.removeChild(infoDump.firstChild);
       }
-      const divElem = document.createElement("div");
-      const hrPreTag = document.createElement("hr");
-      const hrAppTag = document.createElement("hr");
-      divElem.style.borderRadius = "5px";
-      const pElem = document.createElement("p");
-      pElem.style.fontSize = "30px";
-      pElem.style.padding = "15px";
-      pElem.style.color = "white";
-      pElem.textContent = catInfo.breeds[0].description;
       const newCarousel = Carousel.createCarouselItem(
-        catInfo.url,
-        "big fury cat",
-        catInfo.id
+        catData.url,
+        catData.id,
+        catData.id
       );
-      divElem.appendChild(newCarousel);
-      divElem.appendChild(pElem);
-      divElem.appendChild(hrAppTag);
-      divElem.prepend(hrPreTag);
-      infoDump.appendChild(divElem);
+
+      if (catData.breeds[0]) {
+        pElem.textContent = catData.breeds[0].description;
+      } else {
+        pElem.textContent = "There is no description for this beautiful feline";
+      }
+      Carousel.appendCarousel(newCarousel);
     });
+    const hrPreTag = document.createElement("hr");
+    const hrAppTag = document.createElement("hr");
+    pElem.style.fontSize = "30px";
+    pElem.style.padding = "15px";
+    pElem.style.color = "white";
+    infoDump.prepend(hrPreTag);
+    infoDump.appendChild(pElem);
+    infoDump.appendChild(hrAppTag);
   });
-});
+}
 //========================================================================================================//
 
 //========================================================================================================//
